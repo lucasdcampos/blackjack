@@ -8,3 +8,27 @@ body {
 #dealer-hand img, #player-hand img {
     width: 100px;
 }
+
+h1{
+    color: rgb(185, 0, 0);
+    font-size: 48px;
+}
+
+#game-status {
+    color: blue;
+}
+
+#hit-btn, #stay-btn {
+    width: 100px;
+    height: 50px;
+    font-size: 18px;
+    background-color: chocolate;
+    color: white;
+    border: none;
+    border-radius: 6px;
+}
+
+#hit-btn:hover, #stay-btn:hover
+{
+    opacity: .7;
+}

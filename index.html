@@ -5,18 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blackjack</title>
     <link rel="stylesheet" href="style.css">
+    <script src="blackjack.js"></script>
 </head>
 <body>
+    <h1>Blackjack</h1>
     <h2 id="game-status"></h2>
     <h2>Dealer:</h2>
     <div id="dealer-hand">
-        <img src="assets/cards/hidden.png">
-        <img src="assets/cards/2-C.png">
+        <img id="hidden-card" src="assets/cards/hidden.png">
     </div>
     
     <h2>You:</h2>
     <div id="player-hand"></div>
+
     <br>
+    
     <button id="hit-btn">Hit</button>
     <button id="stay-btn">Stay</button>
 </body>
