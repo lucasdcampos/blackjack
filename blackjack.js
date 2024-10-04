@@ -5,7 +5,8 @@ const debug = true;
 
 const hand = new Map();
 const aceCount = new Map();
-
+const cardSfx = new Audio("assets/sfx/new_card.mp3");
+const gameOverSfx = new Audio("assets/sfx/card_game_over.wav");
 var deck = [];
 
 var canHit = true;
@@ -75,7 +76,6 @@ async function hit()
 
     if(getHand("player") > 21)
     {
-        canHit = false;
         await wait(500);
         stay();
     }
@@ -102,6 +102,7 @@ async function stay() {
         return;
     }
 
+    canStay = false;
     canHit = false;
 
     while (hand.get("dealer") < 17) {
@@ -109,13 +110,21 @@ async function stay() {
         await wait(750);
     }
 
-    await wait(100);
+    await wait(150);
+    revealCard();
+    await wait(500);
+    checkWinner();
+}
+
+function revealCard()
+{
     let hidden = document.getElementById("hidden-card");
     let card = deck.pop();
     hidden.src = createCard(card).src;
 
     addValueToHand(getCardValue(card), "dealer");
-    checkWinner();
+
+    cardSfx.play();
 }
 
 function checkWinner()
@@ -144,6 +153,8 @@ function checkWinner()
     {
         status.innerText = "Draw!";
     }
+
+    gameOverSfx.play();
 }
 
 function addCardTo(subject)
@@ -153,6 +164,7 @@ function addCardTo(subject)
     
     addValueToHand(value, subject);
 
+    cardSfx.play();
     document.getElementById(subject+"-hand").appendChild(createCard(card));
 }
 
