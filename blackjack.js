@@ -7,13 +7,18 @@ const hand = new Map();
 const aceCount = new Map();
 const cardSfx = new Audio("assets/sfx/new_card.mp3");
 const gameOverSfx = new Audio("assets/sfx/card_game_over.wav");
-var deck = [];
 
+var hiddenCard;
+var deck = [];
 var canHit = true;
 var canStay = true;
 
 window.onload = function()
 {
+    document.getElementById("hit-btn").addEventListener("click", hit);
+    document.getElementById("stay-btn").addEventListener("click", stay);
+    document.getElementById("play-again-btn").addEventListener("click", playAgain);
+
     buildDeck();
     shuffleDeck();
     startGame();
@@ -56,13 +61,17 @@ function startGame()
     aceCount.set("dealer", 0);
     aceCount.set("player", 0);
 
+    addHiddenCard();
     addCardTo("dealer");
 
     addCardTo("player");
     addCardTo("player");
 
-    document.getElementById("hit-btn").addEventListener("click", hit);
-    document.getElementById("stay-btn").addEventListener("click", stay);
+    canHit = true;
+    canStay = true;
+    
+    document.getElementById("play-again-btn").style.visibility = "hidden";
+
 }
 
 async function hit()
@@ -116,11 +125,18 @@ async function stay() {
     checkWinner();
 }
 
+function addHiddenCard()
+{
+    hiddenCard = document.createElement("img");
+    hiddenCard.src = "assets/cards/hidden.png";
+
+    document.getElementById("dealer-hand").appendChild(hiddenCard);
+}
+
 function revealCard()
 {
-    let hidden = document.getElementById("hidden-card");
     let card = deck.pop();
-    hidden.src = createCard(card).src;
+    hiddenCard.src = createCard(card).src;
 
     addValueToHand(getCardValue(card), "dealer");
 
@@ -155,6 +171,27 @@ function checkWinner()
     }
 
     gameOverSfx.play();
+
+    document.getElementById("play-again-btn").style.visibility = "visible";
+    document.getElementById("hit-btn").style.visibility = "hidden";
+    document.getElementById("stay-btn").style.visibility = "hidden";
+}
+
+function playAgain()
+{
+    document.getElementById("hit-btn").style.visibility = "visible";
+    document.getElementById("stay-btn").style.visibility = "visible";
+
+    let dealer = document.getElementById("dealer-hand");
+    let player = document.getElementById("player-hand");
+
+    while (dealer.hasChildNodes())
+        dealer.firstChild.remove()
+    
+    while (player.hasChildNodes())
+        player.firstChild.remove()
+
+    startGame();
 }
 
 function addCardTo(subject)
