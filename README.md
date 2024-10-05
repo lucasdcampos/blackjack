@@ -1,9 +1,10 @@
-# Blackjack Game
+# Blackjack Game 🃏
 
 This is a simple web-based version of the classic card game, built using **HTML, CSS, and JavaScript**.
 
-
-<img align="center" src="assets/demo.png" width="480px">
+<div align="center">
+  <img src="assets/demo.png" width="720px">
+</div>
 
 ## Features
 - Classic Blackjack rules.
