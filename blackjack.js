@@ -2,6 +2,8 @@
 // last updated: 4/10/2024
 
 const debug = true;
+const suits = ["C", "D", "H", "S"];
+const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"];
 
 const hand = new Map();
 const aceCount = new Map();
@@ -17,6 +19,8 @@ var sounds = true;
 
 window.onload = function()
 {
+    preloadImages(); 
+
     document.getElementById("hit-btn").addEventListener("click", hit);
     document.getElementById("stay-btn").addEventListener("click", stay);
     document.getElementById("play-again-btn").addEventListener("click", playAgain);
@@ -27,6 +31,15 @@ window.onload = function()
     buildDeck();
     shuffleDeck();
     startGame();
+}
+
+function preloadImages() {
+    suits.forEach(suit => {
+        values.forEach(value => {
+            let img = new Image();
+            img.src = "assets/cards/" + value + "-" + suit + ".png";
+        });
+    });
 }
 
 function toggleSound()
@@ -44,9 +57,6 @@ function playSound(audio) {
 
 function buildDeck()
 {
-    let suits = ["C", "D", "H", "S"];
-    let values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"];
-
     for(i = 0; i < suits.length; i++)
     {
         for(j = 0; j < values.length; j++)
@@ -54,7 +64,6 @@ function buildDeck()
             deck.push(values[j] + "-" + suits[i]);
         }
     }
-
 }
 
 function shuffleDeck()
@@ -160,7 +169,7 @@ function spawnCard(card, subject)
     document.getElementById(subject+"-hand").appendChild(card);
 }
 
-function revealCard()
+async function revealCard()
 {
     let card = deck.pop();
     hiddenCard.src = createCard(card).src;
