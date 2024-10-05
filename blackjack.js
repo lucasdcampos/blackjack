@@ -16,6 +16,7 @@ var canHit = true;
 var canStay = true;
 var firstTime = true;
 var sounds = true;
+var delay = 500;
 
 window.onload = function()
 {
@@ -83,7 +84,7 @@ function shuffleDeck()
 
 async function startGame()
 {
-    let ms = firstTime ? 0 : 500;
+    let ms = firstTime ? 0 : delay;
 
     hand.set("dealer", 0);
     hand.set("player", 0);
@@ -115,7 +116,7 @@ async function hit()
 
     if(getHand("player") > 21)
     {
-        await wait(500);
+        await wait(delay);
         await stay();
     }
 }
@@ -146,12 +147,12 @@ async function stay() {
 
     while (hand.get("dealer") < 17) {
         await addCardTo("dealer");
-        await wait(750);
+        await wait(delay * 1.5);
     }
 
-    await wait(150);
+    await wait(delay * 0.25);
     revealCard();
-    await wait(500);
+    await wait(delay);
     checkWinner();
 }
 
