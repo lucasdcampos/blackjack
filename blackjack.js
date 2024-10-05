@@ -29,8 +29,6 @@ window.onload = function()
 
     document.getElementById("sounds-btn").addEventListener("click", toggleSound);
 
-    buildDeck();
-    shuffleDeck();
     startGame();
 }
 
@@ -84,6 +82,9 @@ function shuffleDeck()
 
 async function startGame()
 {
+    buildDeck();
+    shuffleDeck();
+
     let ms = firstTime ? 0 : delay;
 
     hand.set("dealer", 0);
@@ -116,6 +117,7 @@ async function hit()
 
     if(getHand("player") > 21)
     {
+        canHit = false;
         await wait(delay);
         await stay();
     }
