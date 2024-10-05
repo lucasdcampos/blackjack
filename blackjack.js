@@ -13,6 +13,7 @@ var deck = [];
 var canHit = true;
 var canStay = true;
 var firstTime = true;
+var sounds = true;
 
 window.onload = function()
 {
@@ -21,10 +22,24 @@ window.onload = function()
     document.getElementById("play-again-btn").addEventListener("click", playAgain);
     document.getElementById("play-again-btn").style.visibility = "hidden";
 
+    document.getElementById("sounds-btn").addEventListener("click", toggleSound);
 
     buildDeck();
     shuffleDeck();
     startGame();
+}
+
+function toggleSound()
+{
+    sounds = !sounds;
+    
+    document.getElementById("sounds-btn").style.opacity = sounds ? 1 : 0.5;
+}
+
+function playSound(audio) {
+    if (audio && typeof audio.play === 'function' && sounds) {
+        audio.play();
+    }
 }
 
 function buildDeck()
@@ -141,7 +156,7 @@ function addHiddenCard()
 
 function spawnCard(card, subject)
 {
-    cardSfx.play();
+    playSound(cardSfx);
     document.getElementById(subject+"-hand").appendChild(card);
 }
 
@@ -151,7 +166,7 @@ function revealCard()
     hiddenCard.src = createCard(card).src;
 
     addValueToHand(getCardValue(card), "dealer");
-    cardSfx.play();
+    playSound(cardSfx);
 }
 
 function checkWinner()
@@ -170,7 +185,7 @@ function checkWinner()
         status.innerText = player > dealer ? "Player won!" : "Dealer won!";
     }
 
-    gameOverSfx.play();
+    playSound(gameOverSfx);
     endGame();
 }
 
