@@ -147,14 +147,15 @@ async function stay() {
     canStay = false;
     canHit = false;
 
-    while (hand.get("dealer") < 17) {
+    await wait(delay * 0.25);
+    revealCard();
+    await wait(delay)
+
+    while (getHand("dealer") < 17) {
         await addCardTo("dealer");
         await wait(delay * 1.5);
     }
 
-    await wait(delay * 0.25);
-    revealCard();
-    await wait(delay);
     checkWinner();
 }
 
