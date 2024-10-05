@@ -81,14 +81,14 @@ async function startGame()
     aceCount.set("dealer", 0);
     aceCount.set("player", 0);
 
-    addHiddenCard();
+    await addHiddenCard();
     await wait(ms);
-    addCardTo("dealer");
+    await addCardTo("dealer");
     await wait(ms);
 
-    addCardTo("player");
+    await addCardTo("player");
     await wait(ms);
-    addCardTo("player");
+    await addCardTo("player");
     
     canHit = true;
     canStay = true;
@@ -102,7 +102,7 @@ async function hit()
         return;
     }
 
-    addCardTo("player");
+    await addCardTo("player");
 
     if(getHand("player") > 21)
     {
@@ -136,14 +136,14 @@ async function stay() {
     canHit = false;
 
     while (hand.get("dealer") < 17) {
-        addCardTo("dealer");
+        await addCardTo("dealer");
         await wait(750);
     }
 
     await wait(150);
-    revealCard();
+    await revealCard();
     await wait(500);
-    checkWinner();
+    await checkWinner();
 }
 
 function addHiddenCard()
