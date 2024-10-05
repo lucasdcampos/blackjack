@@ -90,14 +90,14 @@ async function startGame()
     aceCount.set("dealer", 0);
     aceCount.set("player", 0);
 
-    await addHiddenCard();
+    addHiddenCard();
     await wait(ms);
-    await addCardTo("dealer");
+    addCardTo("dealer");
     await wait(ms);
 
-    await addCardTo("player");
+    addCardTo("player");
     await wait(ms);
-    await addCardTo("player");
+    addCardTo("player");
     
     canHit = true;
     canStay = true;
@@ -111,7 +111,7 @@ async function hit()
         return;
     }
 
-    await addCardTo("player");
+    addCardTo("player");
 
     if(getHand("player") > 21)
     {
@@ -131,7 +131,7 @@ function getHand(subject)
     return hand.get(subject);
 }
 
-function wait(ms) {
+async function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -150,9 +150,9 @@ async function stay() {
     }
 
     await wait(150);
-    await revealCard();
+    revealCard();
     await wait(500);
-    await checkWinner();
+    checkWinner();
 }
 
 function addHiddenCard()
@@ -169,7 +169,7 @@ function spawnCard(card, subject)
     document.getElementById(subject+"-hand").appendChild(card);
 }
 
-async function revealCard()
+function revealCard()
 {
     let card = deck.pop();
     hiddenCard.src = createCard(card).src;
