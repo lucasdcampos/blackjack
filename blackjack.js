@@ -38,8 +38,6 @@ window.onload = function()
     playAgainBtn.addEventListener("click", playAgain);
     playAgainBtn.style.visibility = "hidden";
 
-    buildDeck();
-    shuffleDeck();
     startGame();
 }
 
@@ -47,6 +45,9 @@ async function startGame()
 {
     let ms = firstTime ? 0 : animationDelay;
 
+    buildDeck();
+    shuffleDeck();
+    
     hand.set("dealer", 0);
     hand.set("player", 0);
     aceCount.set("dealer", 0);
