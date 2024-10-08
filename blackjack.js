@@ -1,9 +1,10 @@
 // blackjack
-// last updated: 4/10/2024
+// last updated: 10/8/2024
 
-const debug = true;
+const debug = true; // to debug log messages
 const suits = ["C", "D", "H", "S"];
 const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"];
+const ACE_VALUE = 11;
 
 const hand = new Map();
 const aceCount = new Map();
@@ -16,76 +17,35 @@ var canHit = true;
 var canStay = true;
 var firstTime = true;
 var sounds = true;
-var delay = 500;
+var animationDelay = 500;
+
+var hitBtn;
+var stayBtn;
+var soundsBtn;
+var playAgainBtn;
 
 window.onload = function()
 {
     preloadImages(); 
+    hitBtn = document.getElementById("hit-btn");
+    stayBtn = document.getElementById("stay-btn");
+    soundsBtn = document.getElementById("sounds-btn");
+    playAgainBtn = document.getElementById("play-again-btn");
 
-    document.getElementById("hit-btn").addEventListener("click", hit);
-    document.getElementById("stay-btn").addEventListener("click", stay);
-    document.getElementById("play-again-btn").addEventListener("click", playAgain);
-    document.getElementById("play-again-btn").style.visibility = "hidden";
+    hitBtn.addEventListener("click", hit);
+    stayBtn.addEventListener("click", stay);
+    soundsBtn.addEventListener("click", toggleSound);
+    playAgainBtn.addEventListener("click", playAgain);
+    playAgainBtn.style.visibility = "hidden";
 
-    document.getElementById("sounds-btn").addEventListener("click", toggleSound);
-
+    buildDeck();
+    shuffleDeck();
     startGame();
-}
-
-function preloadImages() {
-    suits.forEach(suit => {
-        values.forEach(value => {
-            let img = new Image();
-            img.src = "assets/cards/" + value + "-" + suit + ".png";
-        });
-    });
-}
-
-function toggleSound()
-{
-    sounds = !sounds;
-    
-    document.getElementById("sounds-btn").style.opacity = sounds ? 1 : 0.5;
-}
-
-function playSound(audio) {
-    if (audio && typeof audio.play === 'function' && sounds) {
-        audio.play();
-    }
-}
-
-function buildDeck()
-{
-    for(i = 0; i < suits.length; i++)
-    {
-        for(j = 0; j < values.length; j++)
-        {
-            deck.push(values[j] + "-" + suits[i]);
-        }
-    }
-}
-
-function shuffleDeck()
-{
-    let currentIndex = deck.length;
-
-    while (currentIndex != 0) {
-
-        let randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-
-        // swapping cards
-        [deck[currentIndex], deck[randomIndex]] = [deck[randomIndex], deck[currentIndex]];
-    }
-
 }
 
 async function startGame()
 {
-    buildDeck();
-    shuffleDeck();
-
-    let ms = firstTime ? 0 : delay;
+    let ms = firstTime ? 0 : animationDelay;
 
     hand.set("dealer", 0);
     hand.set("player", 0);
@@ -106,57 +66,39 @@ async function startGame()
     firstTime = false;
 }
 
-async function hit()
+function buildDeck()
 {
-    if(!canHit)
+    for(i = 0; i < suits.length; i++)
     {
-        return;
-    }
-
-    addCardTo("player");
-
-    if(getHand("player") > 21)
-    {
-        canHit = false;
-        await wait(delay);
-        await stay();
+        for(j = 0; j < values.length; j++)
+        {
+            deck.push(values[j] + "-" + suits[i]);
+        }
     }
 }
 
-function getHand(subject)
+function shuffleDeck()
 {
-    while(hand.get(subject) > 21 && aceCount.get(subject) > 0)
-    {
-        addValueToHand(-10, subject);
-        adjustAceCount(-1, subject);
-    }
+    let currentIndex = deck.length;
 
-    return hand.get(subject);
+    while (currentIndex != 0)
+    {
+
+        let randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // swapping cards
+        [deck[currentIndex], deck[randomIndex]] = [deck[randomIndex], deck[currentIndex]];
+    }
 }
 
-async function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function stay() {
-    if(!canStay)
-    {
-        return;
-    }
-
-    canStay = false;
-    canHit = false;
-
-    await wait(delay * 0.25);
-    revealCard();
-    await wait(delay)
-
-    while (getHand("dealer") < 17) {
-        await addCardTo("dealer");
-        await wait(delay * 1.5);
-    }
-
-    checkWinner();
+function addCardTo(subject)
+{
+    let card = deck.pop();
+    let value = getCardValue(card);
+    
+    addValueToHand(value, subject);
+    spawnCard(createCard(card), subject);
 }
 
 function addHiddenCard()
@@ -171,67 +113,6 @@ function spawnCard(card, subject)
 {
     playSound(cardSfx);
     document.getElementById(subject+"-hand").appendChild(card);
-}
-
-function revealCard()
-{
-    let card = deck.pop();
-    hiddenCard.src = createCard(card).src;
-
-    addValueToHand(getCardValue(card), "dealer");
-    playSound(cardSfx);
-}
-
-function checkWinner()
-{
-    let status = document.getElementById("game-status");
-    let dealer = getHand("dealer");
-    let player = getHand("player");
-
-    if (player > 21) {
-        status.innerText = "Dealer won!\nPlayer busted";
-    } else if (dealer > 21) {
-        status.innerText = "Player won!\nDealer busted";
-    } else if (player === dealer) {
-        status.innerText = "Draw!";
-    } else {
-        status.innerText = player > dealer ? "Player won!" : "Dealer won!";
-    }
-
-    playSound(gameOverSfx);
-    endGame();
-}
-
-function endGame() {
-    document.getElementById("play-again-btn").style.visibility = "visible";
-    document.getElementById("play-again-btn").focus(); 
-    document.getElementById("hit-btn").style.visibility = "hidden";
-    document.getElementById("stay-btn").style.visibility = "hidden";
-    
-}
-
-
-function clearHands() {
-    document.getElementById("dealer-hand").innerHTML = '';
-    document.getElementById("player-hand").innerHTML = '';
-}
-
-function playAgain() {
-    document.getElementById("play-again-btn").style.visibility = "hidden";
-    document.getElementById("hit-btn").style.visibility = "visible";
-    document.getElementById("stay-btn").style.visibility = "visible";
-    document.getElementById("game-status").innerText = "";
-    clearHands();
-    startGame();
-}
-
-function addCardTo(subject)
-{
-    let card = deck.pop();
-    let value = getCardValue(card);
-    
-    addValueToHand(value, subject);
-    spawnCard(createCard(card), subject);
 }
 
 function createCard(card)
@@ -251,11 +132,121 @@ function addValueToHand(value, subject)
     hand.set(subject, newValue);
 
     log("adding " + value + " to " + subject);
-
-    if(value == 11)
+    
+    if(value == ACE_VALUE)
     {
         adjustAceCount(1, subject);
     }
+}
+
+async function hit()
+{
+    if(!canHit)
+    {
+        return;
+    }
+
+    addCardTo("player");
+
+    if(getHand("player") > 21)
+    {
+        await wait(animationDelay);
+        await stay();
+    }
+}
+
+async function stay()
+{
+    if(!canStay)
+    {
+        return;
+    }
+
+    canStay = false;
+    canHit = false;
+
+    while (hand.get("dealer") < 17)
+    {
+        await addCardTo("dealer");
+        await wait(animationDelay * 1.5);
+    }
+
+    await wait(animationDelay * 0.25);
+    revealCard();
+    await wait(animationDelay);
+    checkWinner();
+}
+
+function getHand(subject)
+{
+    while(hand.get(subject) > 21 && aceCount.get(subject) > 0)
+    {
+        addValueToHand(-10, subject);
+        adjustAceCount(-1, subject);
+    }
+
+    return hand.get(subject);
+}
+
+function revealCard()
+{
+    let card = deck.pop();
+    hiddenCard.src = createCard(card).src;
+
+    addValueToHand(getCardValue(card), "dealer");
+    playSound(cardSfx);
+}
+
+function checkWinner()
+{
+    let status = document.getElementById("game-status");
+    let dealer = getHand("dealer");
+    let player = getHand("player");
+
+    if (player > 21)
+    {
+        status.innerText = "Dealer won!\nPlayer busted";
+    }
+    else if (dealer > 21)
+    {
+        status.innerText = "Player won!\nDealer busted";
+    }
+    else if (player === dealer)
+    {
+        status.innerText = "Draw!";
+    }
+    else
+    {
+        status.innerText = player > dealer ? "Player won!" : "Dealer won!";
+    }
+
+    playSound(gameOverSfx);
+    endGame();
+}
+
+function endGame()
+{
+    playAgainBtn.style.visibility = "visible";
+    playAgainBtn.focus(); 
+    hitBtn.style.visibility = "hidden";
+    stayBtn.style.visibility = "hidden";
+}
+
+
+function clearHands()
+{
+    document.getElementById("dealer-hand").innerHTML = '';
+    document.getElementById("player-hand").innerHTML = '';
+}
+
+function playAgain()
+{
+    playAgainBtn.style.visibility = "hidden";
+    hitBtn.style.visibility = "visible";
+    stayBtn.style.visibility = "visible";
+    document.getElementById("game-status").innerText = "";
+    clearHands();
+    startGame();
 }
 
 function adjustAceCount(increment, subject)
@@ -271,13 +262,43 @@ function getCardValue(card)
     {
         if(data[0] == "A")
         {
-            return 11;
+            return ACE_VALUE;
         }
 
         return 10;
     }
 
     return parseInt(data[0]);
+}
+
+async function wait(ms)
+{
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// used to cache images and display them faster
+function preloadImages() {
+    suits.forEach(suit => {
+        values.forEach(value =>{
+            let img = new Image();
+            img.src = "assets/cards/" + value + "-" + suit + ".png";
+        });
+    });
+}
+
+function toggleSound()
+{
+    sounds = !sounds;
+    
+    soundsBtn.style.opacity = sounds ? 1 : 0.5;
+}
+
+function playSound(audio)
+{
+    if (audio && typeof audio.play === 'function' && sounds)
+    {
+        audio.play();
+    }
 }
 
 function log(message)
